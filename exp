@@ -1,0 +1,396 @@
+1. Uninformed st
+breadth fs
+from collections import deque
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+while queue:
+        vertex = queue.popleft()
+        print(vertex, end=" ")
+for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['F'],
+    'F': []}
+bfs(graph, 'A')
+
+
+2. Informed st
+Best first
+from queue import PriorityQueue
+v = 14
+graph = [[] for i in range(v)]
+def best_first_search(actual_Src, target, n):
+    visited = [False] * n
+    pq = PriorityQueue()
+    pq.put((0, actual_Src))
+    visited[actual_Src] = True
+while pq.empty() == False:
+        u = pq.get()[1]
+        # Displaying the path having lowest cost
+        print(u, end=" ")
+        if u == target:
+            break
+ for v, c in graph[u]:
+            if visited[v] == False:
+                visited[v] = True
+                pq.put((c, v))
+    print()
+def addedge(x, y, cost):
+    graph[x].append((y, cost))
+    graph[y].append((x, cost))
+addedge(0, 1, 3)
+addedge(0, 2, 6)
+addedge(0, 3, 5)
+addedge(1, 4, 9)
+addedge(1, 5, 8)
+addedge(2, 6, 12)
+addedge(2, 7, 14)
+addedge(3, 8, 7)
+addedge(8, 9, 5)
+addedge(8, 10, 6)
+addedge(9, 11, 1)
+addedge(9, 12, 10)
+addedge(9, 13, 2)
+source = 0
+target = 9
+best_first_search(source, target, v)
+
+A*
+import heapq
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+def greedy_best_first_search(maze, start, end):
+    open_list = []
+    came_from = {}  # Tracks path history
+    visited = set()  # Keeps track of visited nodes to prevent revisiting
+    heapq.heappush(open_list, (heuristic(start, end), start))
+    came_from[start] = None  # Start has no parent
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Right, Down, Left, Up
+     while open_list:
+        current_heuristic, current = heapq.heappop(open_list)
+if current == end:
+            path = []
+            while current:
+                path.append(current)
+                current = came_from[current]
+            return path[::-1]
+visited.add(current)
+        for direction in directions:
+            neighbor = (current[0] + direction[0], current[1] + direction[1])
+            if (0 <= neighbor[0] < len(maze)) and (0 <= neighbor[1] < len(maze[0])):
+                if maze[neighbor[0]][neighbor[1]] == 0 and neighbor not in visited:
+                    visited.add(neighbor)
+                    came_from[neighbor] = current
+                    heapq.heappush(open_list, (heuristic(neighbor, end), neighbor))
+    return None  # If no path is found
+maze = [
+    [0, 0, 0, 0, 1],
+    [0, 1, 1, 0, 1],
+    [0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0]
+]
+start = (0, 0)
+end = (4, 4)
+path = greedy_best_first_search(maze, start, end)
+print("Path from start to end:", path)
+
+
+3. Local search
+def hill_climbing(func, start_x, step=0.1, max_iter=100):
+    x = start_x
+    for _ in range(max_iter):
+        
+        left = x - step
+        right = x + step
+        
+        
+        if func(right) > func(x):
+            x = right
+        elif func(left) > func(x):
+            x = left
+        else:
+          
+            break
+            
+    return x, func(x)
+def func(x):
+    return -x**2 + 4*x
+start_x = 0.5
+optimal_x, optimal_value = hill_climbing(func, start_x)
+print(f"Local maximum found at x = {optimal_x}, with value = {optimal_value}")
+
+
+4. Agent architecture
+Model-Based Reflex Agent
+ Initialize:
+ Set current_position to starting location
+ Set current_state to CLEANING
+ Create internal map of environment
+While true:
+ Perceive environment:
+ Get sensor readings for obstacles, dirt, and current position
+ Update internal map based on sensor data
+ If current_state is CLEANING:
+ If current_position is dirty:
+ Perform suck action to clean dirt[1][2]
+ Else:
+ Choose next action based on internal map and cleaning strategy:
+ If nearest dirty location is to the right:
+ Perform action_right() to move right[4]
+ Else if nearest dirty location is down: 
+ Perform action_down() to move down[4]
+ Else if nearest dirty location is to the left:
+ Perform action_left() to move left[4]
+ Else:
+ Perform action_up() to move up[4]
+ Else if current_state is RETURNING_TO_BASE:
+ If current_position is home base:
+ Set current_state to CHARGING
+ Else:
+ Choose action to return to home base using internal map
+ Else if current_state is CHARGING:
+ If battery is full:
+ Set current_state to CLEANING
+ Else:
+ Perform charging action
+ Update current_position based on action taken
+  Sleep for short time to simulate real-time operation
+
+
+5.PROLOG MONKEY BANANA
+sudo apt update
+sudo apt install swi-prolog
+nano monkey_banana.pl
+CODE:
+% Clauses:
+in_room(bananas).
+in_room(chair).
+in_room(monkey).
+clever(monkey).
+can_climb(monkey, chair).
+tall(chair).
+can_move(monkey, chair, bananas).
+can_reach(X, Y):-clever(X).
+get_on(X,Y):-
+can_climb(X,Y).
+under(Y,Z):-
+in_room(X),in_room(Y),
+in_room(Z),can_climb(X,Y,Z).
+clever(X,Z):-
+get_on(X,Y), under(Y,Z);
+tall(Y).
+
+RUN TERMINAL:swipl -s monkey_banana.pl
+QUERY:?-1. can_reach(monkey,bananas).
+        2. can_reach(A,B).
+OUTPUT:true
+       monkey
+
+
+optional:
+pip install pyswip
+from pyswip import Prolog
+prolog = Prolog()
+prolog.consult("monkey_banana.pl")
+for result in prolog.query("plan(state(at(monkey, a), on(floor), at(banana, b), has(monkey, nothing)), Actions, FinalState)"):
+    print("Actions:", result["Actions"])
+    print("Final State:", result["FinalState"])
+run:python3 monkey_banana.py
+
+
+6.PROLOG 8PUZZLE PROBLEM
+% render solutions nicely.
+:- use_rendering(chess).
+
+%%    queens(+N, -Queens) is nondet.
+%
+%	@param	Queens is a list of column numbers for placing the queens.
+%	@author Richard A. O'Keefe (The Craft of Prolog)
+
+queens(N, Queens) :-
+    length(Queens, N),
+	board(Queens, Board, 0, N, _, _),
+	queens(Board, 0, Queens).
+
+board([], [], N, N, _, _).
+board([_|Queens], [Col-Vars|Board], Col0, N, [_|VR], VC) :-
+	Col is Col0+1,
+	functor(Vars, f, N),
+	constraints(N, Vars, VR, VC),
+	board(Queens, Board, Col, N, VR, [_|VC]).
+
+constraints(0, _, _, _) :- !.
+constraints(N, Row, [R|Rs], [C|Cs]) :-
+	arg(N, Row, R-C),
+	M is N-1,
+	constraints(M, Row, Rs, Cs).
+
+queens([], _, []).
+queens([C|Cs], Row0, [Col|Solution]) :-
+	Row is Row0+1,
+	select(Col-Vars, [C|Cs], Board),
+	arg(Row, Vars, Row-Row),
+	queens(Board, Row, Solution).
+
+QUERY:queens(8, Queens).
+
+7. Bayesian network
+1.pip install pgmpy
+from pgmpy.models import BayesianNetwork
+from pgmpy.inference import VariableElimination
+from pgmpy.inference import BeliefPropagation
+from pgmpy.factors.discrete import TabularCPD
+
+# Step 1: Define the structure of the BBN
+model = BayesianNetwork([('Disease_A', 'Symptom_X'), 
+                          ('Disease_B', 'Symptom_X')])
+
+# Step 2: Define the Conditional Probability Distributions (CPDs)
+
+# P(Disease A)
+cpd_disease_a = TabularCPD(variable='Disease_A', 
+                           variable_card=2,  # 0: No Disease A, 1: Disease A
+                           values=[[0.9], [0.1]])  # P(Disease A)
+
+# P(Disease B)
+cpd_disease_b = TabularCPD(variable='Disease_B', 
+                           variable_card=2,  # 0: No Disease B, 1: Disease B
+                           values=[[0.95], [0.05]])  # P(Disease B)
+
+# P(Symptom X | Disease A, Disease B)
+cpd_symptom_x = TabularCPD(variable='Symptom_X', 
+                           variable_card=2,  # 0: No Symptom X, 1: Symptom X
+                           values=[[0.01, 0.6, 0.6, 0.8],  # P(Symptom X=0 | ...)
+                                   [0.99, 0.4, 0.4, 0.2]],  # P(Symptom X=1 | ...)
+                           evidence=['Disease_A', 'Disease_B'], 
+                           evidence_card=[2, 2])  # 2 states for each disease
+
+# Step 3: Add CPDs to the model
+model.add_cpds(cpd_disease_a, cpd_disease_b, cpd_symptom_x)
+
+# Step 4: Verify the model
+assert model.check_model()
+
+# Step 5: Perform inference
+inference = VariableElimination(model)
+
+# Query: What is the probability of Disease A given Symptom X?
+query_result = inference.query(variables=['Disease_A'], 
+                                evidence={'Symptom_X': 1})
+
+print(query_result)
+
+or
+import numpy as np
+import matplotlib.pyplot as plt
+from pgmpy.models import BayesianModel
+from pgmpy.inference import VariableElimination
+from pgmpy.inference import BeliefPropagation
+from pgmpy.factors.discrete import TabularCPD
+
+# Define the Bayesian Network structure
+model = BayesianModel([('Rain', 'Traffic'), ('Traffic', 'Accident')])
+
+# Define the CPDs
+cpd_rain = TabularCPD(variable='Rain', variable_card=2, 
+                      values=[[0.7], [0.3]])  # P(Rain)
+
+cpd_traffic = TabularCPD(variable='Traffic', variable_card=2, 
+                         values=[[0.8, 0.4],  # P(Traffic | Rain)
+                                 [0.2, 0.6]], 
+                         evidence=['Rain'], evidence_card=[2])
+
+cpd_accident = TabularCPD(variable='Accident', variable_card=2, 
+                          values=[[0.9, 0.5],  # P(Accident | Traffic)
+                                  [0.1, 0.5]], 
+                          evidence=['Traffic'], evidence_card=[2])
+
+# Add CPDs to the model
+model.add_cpds(cpd_rain, cpd_traffic, cpd_accident)
+
+# Check if the model is valid
+assert model.check_model()
+
+# Perform inference
+infer = VariableElimination(model)
+
+# Query for the probability of an accident given that it is raining
+result = infer.query(variables=['Accident'], evidence={'Rain': 1})
+print("Probability of Accident given Rain:")
+print(result)
+
+# Query for the probability of Traffic given that there is an Accident
+result = infer.query(variables=['Traffic'], evidence={'Accident': 1})
+print("\nProbability of Traffic given Accident:")
+print(result)
+
+# Visualizing the Bayesian Network
+pos = {'Rain': (0, 1), 'Traffic': (1, 1), 'Accident': (2, 1)}
+plt.figure(figsize=(8, 5))
+plt.title("Bayesian Network: Rain, Traffic, and Accident")
+plt.axis('off')
+
+# Draw the edges
+for edge in model.edges():
+    plt.plot([pos[edge[0]][0], pos[edge[1]][0]], [pos[edge[0]][1], pos[edge[1]][1]], 'k-')
+
+# Draw the nodes
+for node in model.nodes():
+    plt.scatter(*pos[node], s=1000, label=node)
+    plt.text(pos[node][0], pos[node][1], node, ha='center', va='center', fontsize=12)
+
+plt.legend()
+plt.show()
+
+
+or 
+from pgmpy.models import BayesianNetwork
+from pgmpy.factors.discrete import TabularCPD
+from pgmpy.inference import VariableElimination
+# Step 1: Define the structure of the Bayesian Network
+model = BayesianNetwork([
+ ('B', 'A'), # Burglary causes Alarm
+ ('E', 'A'), # Earthquake causes Alarm
+ ('A', 'D'), # Alarm causes David to call
+ ('A', 'S') # Alarm causes Sophia to call
+])
+# Step 2: Define the Conditional Probability Distributions (CPDs)
+# Burglary CPD: P(B)
+cpd_b = TabularCPD(variable='B', variable_card=2, values=[[0.999], [0.001]])
+# Earthquake CPD: P(E)
+cpd_e = TabularCPD(variable='E', variable_card=2, values=[[0.998], [0.002]])
+# Alarm CPD: P(A | B, E)
+cpd_a = TabularCPD(variable='A', variable_card=2,
+ values=[[0.999, 0.71, 0.06, 0.05],
+ [0.001, 0.29, 0.94, 0.95]],
+ evidence=['B', 'E'], evidence_card=[2, 2])
+# David's call CPD: P(D | A)
+cpd_d = TabularCPD(variable='D', variable_card=2,
+ values=[[0.99, 0.3], [0.01, 0.7]],
+ evidence=['A'], evidence_card=[2])
+# Sophia's call CPD: P(S | A)
+cpd_s = TabularCPD(variable='S', variable_card=2,
+ values=[[0.95, 0.4], [0.05, 0.6]],
+ evidence=['A'], evidence_card=[2])
+# Step 3: Add CPDs to the model
+model.add_cpds(cpd_b, cpd_e, cpd_a, cpd_d, cpd_s)
+# Check if the model is valid
+assert model.check_model()
+# Step 4: Perform inference
+inference = VariableElimination(model)
+# Step 5: Compute the probability P(A=True, B=False, E=False, D=True, S=True)
+result = inference.query(variables=['A', 'B', 'E', 'D', 'S'],
+ evidence={'B': 0, 'E': 0, 'D': 1, 'S': 1})
+# Print the result
+print(result) 
+
+
