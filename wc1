@@ -1,0 +1,221 @@
+2.Implementation of all dimension tables and fact table based on case study
+sudo apt update
+sudo apt install mysql-server
+sudo mysql_secure_installation
+sudo mysql -u root -p
+CREATE DATABASE RailwayDW;
+USE RailwayDW;
+CREATE TABLE Passenger_Dim (
+    PassengerID INT PRIMARY KEY,
+    PassengerName VARCHAR(50),
+    Gender CHAR(1),
+    Age INT,
+    ContactNumber VARCHAR(15)
+);
+CREATE TABLE Train_Dim (
+    TrainID INT PRIMARY KEY,
+    TrainName VARCHAR(50),
+    TrainType VARCHAR(30)
+);
+CREATE TABLE Route_Dim (
+    RouteID INT PRIMARY KEY,
+    Source VARCHAR(50),
+    Destination VARCHAR(50),
+    Distance INT
+);
+CREATE TABLE Time_Dim (
+    TimeID INT PRIMARY KEY,
+    TravelDate DATE,
+    DayOfWeek VARCHAR(10),
+    Month VARCHAR(20),
+    Year INT
+);
+CREATE TABLE Reservation_Fact (
+    ReservationID INT PRIMARY KEY,
+    PassengerID INT,
+    TrainID INT,
+    RouteID INT,
+    TimeID INT,
+    SeatsBooked INT,
+    TotalAmount DECIMAL(10, 2),
+    FOREIGN KEY (PassengerID) REFERENCES Passenger_Dim(PassengerID),
+    FOREIGN KEY (TrainID) REFERENCES Train_Dim(TrainID),
+    FOREIGN KEY (RouteID) REFERENCES Route_Dim(RouteID),
+    FOREIGN KEY (TimeID) REFERENCES Time_Dim(TimeID)
+);
+INSERT INTO Passenger_Dim VALUES
+(1, 'Amit Kumar', 'M', 28, '9876543210'),
+(2, 'Priya Sharma', 'F', 22, '8765432109'),
+(3, 'Rahul Singh', 'M', 30, '7654321098');
+INSERT INTO Train_Dim VALUES
+(1, 'Rajdhani Express', 'Express'),
+(2, 'Shatabdi Express', 'Express');
+INSERT INTO Route_Dim VALUES
+(1, 'Delhi', 'Mumbai', 1400),
+(2, 'Delhi', 'Bangalore', 2000);
+INSERT INTO Time_Dim VALUES
+(1, '2024-01-15', 'Monday', 'January', 2024),
+(2, '2024-01-16', 'Tuesday', 'January', 2024);
+INSERT INTO Reservation_Fact VALUES
+(1, 1, 1, 1, 1, 2, 1600.00),
+(2, 2, 2, 2, 2, 1, 800.00),
+(3, 3, 1, 1, 1, 3, 2400.00);
+SELECT * FROM Passenger_Dim;
+SELECT * FROM Train_Dim;
+SELECT * FROM Route_Dim;
+SELECT * FROM Time_Dim;
+SELECT * FROM Reservation_Fact;
+
+
+3.Implementation of all dimension tables and fact table for any case
+study. Implementation of OLAP operations: Slice, Dice & Rollup
+sudo apt update
+sudo apt install mysql-server or mysql
+sudo mysql -u root -p
+CREATE DATABASE EduDW;
+USE EduDW;
+
+CREATE TABLE Stu_Dim (
+    StuID INT PRIMARY KEY,
+    StuName VARCHAR(50),
+    Gen CHAR(1),
+    Age INT,
+    Major VARCHAR(30)
+);
+CREATE TABLE Crs_Dim (
+    CrsID INT PRIMARY KEY,
+    CrsName VARCHAR(50),
+    Dept VARCHAR(30),
+    Crdts INT
+);
+CREATE TABLE Sem_Dim (
+    SemID INT PRIMARY KEY,
+    Sem VARCHAR(10),
+    Yr INT
+);
+CREATE TABLE Enr_Fact (
+    EnrID INT PRIMARY KEY,
+    StuID INT,
+    CrsID INT,
+    SemID INT,
+    Grd CHAR(2),
+    FOREIGN KEY (StuID) REFERENCES Stu_Dim(StuID),
+    FOREIGN KEY (CrsID) REFERENCES Crs_Dim(CrsID),
+    FOREIGN KEY (SemID) REFERENCES Sem_Dim(SemID)
+);
+INSERT INTO Stu_Dim VALUES
+(1, 'Amit Sharma', 'M', 21, 'IT'),
+(2, 'Priya Singh', 'F', 22, 'Biology');
+INSERT INTO Crs_Dim VALUES
+(1, 'DBMS', 'IT', 4),
+(2, 'Biology Basics', 'Bio', 3);
+INSERT INTO Sem_Dim VALUES
+(1, 'Fall', 2024),
+(2, 'Spring', 2025);
+INSERT INTO Enr_Fact VALUES
+(1, 1, 1, 1, 'A'),
+(2, 2, 2, 2, 'B');
+1. Slice Operation: Show enrollments for Fall 2024.
+SELECT * FROM Enr_Fact
+JOIN Sem_Dim ON Enr_Fact.SemID = Sem_Dim.SemID
+WHERE Sem_Dim.Sem = 'Fall' AND Sem_Dim.Yr = 2024;
+2. Dice Operation: Show enrollments for IT courses taken by students aged 20 or above.
+SELECT * FROM Enr_Fact
+JOIN Stu_Dim ON Enr_Fact.StuID = Stu_Dim.StuID
+JOIN Crs_Dim ON Enr_Fact.CrsID = Crs_Dim.CrsID
+WHERE Crs_Dim.Dept = 'IT' AND Stu_Dim.Age >= 20;
+3. Rollup Operation: Count the total number of students enrolled in each department.
+SELECT Crs_Dim.Dept, COUNT(Enr_Fact.EnrID) AS TotalEnr
+FROM Enr_Fact
+JOIN Crs_Dim ON Enr_Fact.CrsID = Crs_Dim.CrsID
+GROUP BY Crs_Dim.Dept;
+
+
+7.Implementation of any one classifier using languages like JAVA/ python
+from sklearn.linear_model import LogisticRegression
+# Sample data (features and labels for binary classification)
+X = [[1, 2], [2, 3], [3, 4], [5, 6], [6, 7], [7, 8]]
+y = [0, 0, 0, 1, 1, 1]  # Binary labels (0 or 1)
+# Create and train the Logistic Regression model
+model = LogisticRegression()
+model.fit(X, y)
+# Make a prediction
+prediction = model.predict([[4, 5]])  # Predict for a new data point
+print("Predicted class:",prediction)
+
+
+8.Implementation of any one clustering algorithm using languages like JAVA/
+python
+import math
+def main():
+    # Get input from the user
+    numbers = int(input("How many numbers do you want to enter: "))
+    k = int(input("Enter value of k: "))
+
+    # Get numbers
+    nums = []
+    for i in range(numbers):
+        num = int(input(f"Enter Number {i + 1}: "))
+        nums.append(num)
+
+    # Set initial values for kvals (centroids)
+    kvals = nums[:k]  # Initial centroids are the first k elements
+    prev_kvals = [0] * k  # To store previous centroids
+    steps = 1
+
+    # Create matrices for calculations and group assignments
+    addition = [[0 for _ in range(numbers)] for _ in range(k)]
+    groups = [[] for _ in range(k)]  # Change to list of lists
+
+    # Show values entered by the user
+    print("You have entered:", ', '.join(map(str, nums)))
+
+    # While loop for iterations
+    ok = True
+    while ok:
+        print(f"\nIteration Number: {steps}")
+
+        # Make calculations for the distance between centroids and data points
+        for i in range(k):
+            for j in range(numbers):
+                addition[i][j] = abs(kvals[i] - nums[j])
+
+        # Group the numbers based on minimum distance from centroids
+        for i in range(numbers):
+            min_val = math.inf
+            groupnum = -1
+            for j in range(k):
+                if addition[j][i] < min_val:
+                    min_val = addition[j][i]
+                    groupnum = j
+            groups[groupnum].append(nums[i])
+
+        # Show results of calculations
+        print("\nCalculations")
+        for i in range(numbers):
+            for j in range(k):
+                print(f"{addition[j][i]:.2f}\t", end="")
+            print()
+
+        # Show groups and calculate new centroids
+        print("\nGroups")
+        for i in range(k):
+            if groups[i]:  # Check if the group is not empty
+                sum_vals = sum(groups[i])
+                count = len(groups[i])
+                prev_kvals[i] = kvals[i]
+                kvals[i] = sum_vals / count  # Update the centroid
+                print(f"Group {i + 1}: {', '.join(map(str, groups[i]))} = {kvals[i]:.2f}")
+            else:
+                print(f"Group {i + 1}: (empty group)")
+
+        # Empty the groups for the next iteration
+        groups = [[] for _ in range(k)]
+
+        # Check if centroids have changed, stop if they haven't
+        ok = any(prev_kvals[i] != kvals[i] for i in range(k))
+
+        steps += 1
+
+if __name__ == "__main__":
+    main()
